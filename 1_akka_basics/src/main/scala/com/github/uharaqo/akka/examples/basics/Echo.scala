@@ -8,20 +8,20 @@ import akka.util.Timeout
 import com.github.uharaqo.akka.examples.basics.Echo
 
 import scala.concurrent.duration.*
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
+import scala.concurrent.{ ExecutionContext, ExecutionContextExecutor, Future }
 
 object Echo {
 
   sealed trait Message
+  final case class Ping(message: String, replyTo: ActorRef[Pong]) extends Message
+  final case class Stop(replyTo: ActorRef[Boolean])               extends Message
 
-  case class Ping(message: String, replyTo: ActorRef[Pong]) extends Message
-
-  case class Stop(replyTo: ActorRef[Boolean]) extends Message
-
-  case class Pong(message: String)
+  final case class Pong(message: String)
 
   def apply(): Behavior[Message] =
     Behaviors.setup { ctx =>
+      println(util.Properties.versionMsg)
+
       addShutdownHook(ctx.system)(ctx.executionContext)
 
       Behaviors.receiveMessage {
@@ -34,7 +34,7 @@ object Echo {
       }
     }
 
-  def addShutdownHook(system: ActorSystem[_])(implicit ec: ExecutionContext): Unit = {
+  def addShutdownHook(system: ActorSystem[_])(implicit ec: ExecutionContext): Unit =
     CoordinatedShutdown(system).addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "someTaskName") { () =>
       println("shutting down Echo...")
 
@@ -46,5 +46,4 @@ object Echo {
         Done
       }
     }
-  }
 }

@@ -1,8 +1,8 @@
 package com.github.uharaqo.akka.examples.basics
 
 import akka.NotUsed
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
+import akka.actor.typed.scaladsl.{ ActorContext, Behaviors }
+import akka.actor.typed.{ ActorRef, ActorSystem, Behavior }
 import com.github.uharaqo.akka.examples.basics.Chopstick.*
 import com.github.uharaqo.akka.examples.basics.Hakker.Command
 
@@ -16,24 +16,19 @@ import scala.concurrent.duration.*
 // A Chopstick is an actor, it can be taken, and put back
 object Chopstick {
   sealed trait ChopstickRequest
-
   final case class Take(ref: ActorRef[ChopstickResponse]) extends ChopstickRequest
-
-  final case class Put(ref: ActorRef[ChopstickResponse]) extends ChopstickRequest
+  final case class Put(ref: ActorRef[ChopstickResponse])  extends ChopstickRequest
 
   sealed trait ChopstickResponse
-
-  final case class Ok(chopstick: ActorRef[ChopstickRequest]) extends ChopstickResponse
-
+  final case class Ok(chopstick: ActorRef[ChopstickRequest])   extends ChopstickResponse
   final case class Busy(chopstick: ActorRef[ChopstickRequest]) extends ChopstickResponse
 
   def apply(): Behavior[ChopstickRequest] = available()
 
-  private def available(): Behavior[ChopstickRequest] = Behaviors.receivePartial {
-    case (ctx, Take(hakker)) =>
-      // let the hakker take this chopstick
-      hakker ! Ok(ctx.self)
-      takenBy(hakker)
+  private def available(): Behavior[ChopstickRequest] = Behaviors.receivePartial { case (ctx, Take(hakker)) =>
+    // let the hakker take this chopstick
+    hakker ! Ok(ctx.self)
+    takenBy(hakker)
   }
 
   private def takenBy(hakker: ActorRef[ChopstickResponse]): Behavior[ChopstickRequest] = Behaviors.receivePartial {
@@ -49,11 +44,10 @@ object Chopstick {
 
 // A hakker is an awesome dude or dudette who either thinks about hacking or has to eat ;-)
 object Hakker {
+
   sealed trait Command
-
   case object Think extends Command
-
-  case object Eat extends Command
+  case object Eat   extends Command
 
   final case class HandleChopstickAnswer(msg: ChopstickResponse) extends Command
 
@@ -63,27 +57,27 @@ object Hakker {
     }
 }
 
-class Hakker(ctx: ActorContext[Command],
-             name: String,
-             left: ActorRef[ChopstickRequest],
-             right: ActorRef[ChopstickRequest]) {
+class Hakker(
+    ctx: ActorContext[Command],
+    name: String,
+    left: ActorRef[ChopstickRequest],
+    right: ActorRef[ChopstickRequest]
+) {
 
   import Hakker.*
 
   private val adapter = ctx.messageAdapter(res => HandleChopstickAnswer(res))
 
-  def waiting: Behavior[Command] = Behaviors.receiveMessagePartial {
-    case Think =>
-      ctx.log.info("{} starts to think", name)
-      startThinking(ctx, 5.seconds)
+  def waiting: Behavior[Command] = Behaviors.receiveMessagePartial { case Think =>
+    ctx.log.info("{} starts to think", name)
+    startThinking(ctx, 5.seconds)
   }
 
   // When a hakker is thinking it can become hungry and try to pick up its chopsticks and eat
-  private val thinking: Behavior[Command] = Behaviors.receiveMessagePartial {
-    case Eat =>
-      left ! Chopstick.Take(adapter)
-      right ! Chopstick.Take(adapter)
-      hungry
+  private val thinking: Behavior[Command] = Behaviors.receiveMessagePartial { case Eat =>
+    left ! Chopstick.Take(adapter)
+    right ! Chopstick.Take(adapter)
+    hungry
   }
 
   //When a hakker is hungry it tries to pick up its chopsticks and eat
@@ -104,9 +98,10 @@ class Hakker(ctx: ActorContext[Command],
   //When a hakker is waiting for the last chopstick it can either obtain it
   //and start eating, or the other chopstick was busy, and the hakker goes
   //back to think about how he should obtain his chopsticks :-)
-  private def waitForOtherChopstick(chopstickToWaitFor: ActorRef[ChopstickRequest],
-                                    takenChopstick: ActorRef[ChopstickRequest]
-                                   ): Behavior[Command] = Behaviors.receiveMessagePartial {
+  private def waitForOtherChopstick(
+      chopstickToWaitFor: ActorRef[ChopstickRequest],
+      takenChopstick: ActorRef[ChopstickRequest]
+  ): Behavior[Command] = Behaviors.receiveMessagePartial {
     case HandleChopstickAnswer(Ok(`chopstickToWaitFor`)) =>
       ctx.log.info("{} has picked up {} and {} and starts to eat", name, left.path.name, right.path.name)
       startEating(ctx, 5.seconds)
@@ -118,12 +113,11 @@ class Hakker(ctx: ActorContext[Command],
 
   //When a hakker is eating, he can decide to start to think,
   //then he puts down his chopsticks and starts to think
-  private lazy val eating: Behavior[Command] = Behaviors.receiveMessagePartial {
-    case Think =>
-      ctx.log.info("{} puts down his chopsticks and starts to think", name)
-      left ! Put(adapter)
-      right ! Put(adapter)
-      startThinking(ctx, 5.seconds)
+  private lazy val eating: Behavior[Command] = Behaviors.receiveMessagePartial { case Think =>
+    ctx.log.info("{} puts down his chopsticks and starts to think", name)
+    left ! Put(adapter)
+    right ! Put(adapter)
+    startThinking(ctx, 5.seconds)
   }
 
   //When the results of the other grab comes back,
@@ -138,14 +132,16 @@ class Hakker(ctx: ActorContext[Command],
   }
 
   // gets hungry after 5 sec
-  private def startThinking(ctx: ActorContext[Command], duration: FiniteDuration) = Behaviors.withTimers[Command] { timers =>
-    timers.startSingleTimer(key = Eat, msg = Eat, delay = duration)
-    thinking
+  private def startThinking(ctx: ActorContext[Command], duration: FiniteDuration) = Behaviors.withTimers[Command] {
+    timers =>
+      timers.startSingleTimer(key = Eat, msg = Eat, delay = duration)
+      thinking
   }
 
-  private def startEating(ctx: ActorContext[Command], duration: FiniteDuration) = Behaviors.withTimers[Command] { timers =>
-    timers.startSingleTimer(key = Think, msg = Think, delay = duration)
-    eating
+  private def startEating(ctx: ActorContext[Command], duration: FiniteDuration) = Behaviors.withTimers[Command] {
+    timers =>
+      timers.startSingleTimer(key = Think, msg = Think, delay = duration)
+      eating
   }
 }
 
@@ -159,15 +155,14 @@ object DiningHakkers {
     // Create 5 awesome hakkers and assign them their left and right chopstick
     val hakkers = for {
       (name, i) <- List("Ghosh", "Boner", "Klang", "Krasser", "Manie").zipWithIndex
-    } yield
-      ctx.spawn(
-        behavior = Hakker(
-          name = name,
-          left = chopsticks(i),
-          right = chopsticks((i + 1) % 5)
-        ),
-        name = name
-      )
+    } yield ctx.spawn(
+      behavior = Hakker(
+        name = name,
+        left = chopsticks(i),
+        right = chopsticks((i + 1) % 5)
+      ),
+      name = name
+    )
 
     // Signal all hakkers that they should start thinking, and watch the show
     hakkers.foreach(_ ! Hakker.Think)
@@ -175,7 +170,6 @@ object DiningHakkers {
     Behaviors.empty
   }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     ActorSystem(DiningHakkers(), "DiningHakkers")
-  }
 }
