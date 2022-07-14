@@ -1,17 +1,17 @@
-package com.github.uharaqo.akka.examples.persistence
+package com.github.uharaqo.akka.examples.persistence.es.taskmanager
 
-import akka.actor.testkit.typed.scaladsl.LogCapturing
-import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit.SerializationSettings
-import com.typesafe.config.ConfigFactory
-import com.typesafe.sslconfig.util.ConfigLoader
-import akka.actor.testkit.typed.scaladsl.{ LogCapturing, ScalaTestWithActorTestKit }
+import akka.actor.testkit.typed.scaladsl.{LogCapturing, ScalaTestWithActorTestKit}
 import akka.pattern.StatusReply
 import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit
+import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit.SerializationSettings
 import akka.persistence.typed.PersistenceId
-import com.github.uharaqo.akka.examples.persistence.es.TaskManagerActor
-import com.github.uharaqo.akka.examples.persistence.es.TaskManagerCommand.*
-import com.github.uharaqo.akka.examples.persistence.es.TaskManagerEvent.*
-import com.github.uharaqo.akka.examples.persistence.es.TaskManagerState.*
+import com.github.uharaqo.akka.examples.persistence.es.taskmanager
+import com.github.uharaqo.akka.examples.persistence.es.taskmanager.TaskManagerActor
+import com.github.uharaqo.akka.examples.persistence.es.taskmanager.TaskManagerCommand.*
+import com.github.uharaqo.akka.examples.persistence.es.taskmanager.TaskManagerEvent.*
+import com.github.uharaqo.akka.examples.persistence.es.taskmanager.TaskManagerState.*
+import com.typesafe.config.ConfigFactory
+import com.typesafe.sslconfig.util.ConfigLoader
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.wordspec.AnyWordSpecLike
 
@@ -19,7 +19,6 @@ class TaskManagerSpec
     extends ScalaTestWithActorTestKit(
       EventSourcedBehaviorTestKit.config
         .withFallback(ConfigFactory.load("application.conf"))
-//        .withFallback(EventSourcedBehaviorTestKit.config)
     )
     with AnyWordSpecLike
     with BeforeAndAfterEach
@@ -30,7 +29,7 @@ class TaskManagerSpec
   private val eventSourcedTestKit =
     EventSourcedBehaviorTestKit[Command, Event, Task](
       system,
-      TaskManagerActor(PersistenceId.ofUniqueId("root")),
+      taskmanager.TaskManagerActor(PersistenceId.ofUniqueId("taskmanager1")),
       SerializationSettings.disabled
     )
 
@@ -52,7 +51,7 @@ class TaskManagerSpec
       }
 
       // empty
-      val getResult1 = eventSourcedTestKit.runCommand[StatusReply[Task]](GetTask.apply)
+      val getResult1 = eventSourcedTestKit.runCommand(GetTask.apply)
       getResult1.reply.isError shouldBe true
       getResult1.reply.getError.getMessage shouldBe "Not Found"
 
@@ -62,7 +61,7 @@ class TaskManagerSpec
       verify(started, task, Some(TaskStarted(taskId1)))
 
       // GetCommand works
-      val getResult2 = eventSourcedTestKit.runCommand[StatusReply[Task]](GetTask.apply)
+      val getResult2 = eventSourcedTestKit.runCommand(GetTask.apply)
       getResult2.reply.getValue shouldBe task
       verify(getResult2, task, None)
 

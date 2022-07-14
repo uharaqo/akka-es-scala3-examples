@@ -3,7 +3,7 @@ package com.github.uharaqo.akka.examples.persistence
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.persistence.typed.PersistenceId
-import com.github.uharaqo.akka.examples.persistence.es.TaskManagerActor
+import com.github.uharaqo.akka.examples.persistence.es.taskmanager.TaskManagerActor
 import org.slf4j.LoggerFactory
 
 import scala.util.control.NonFatal

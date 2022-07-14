@@ -1,4 +1,4 @@
-package com.github.uharaqo.akka.examples.persistence.es
+package com.github.uharaqo.akka.examples.persistence.es.taskmanager
 
 object TaskManagerState {
 

@@ -1,15 +1,15 @@
-package com.github.uharaqo.akka.examples.persistence.es
+package com.github.uharaqo.akka.examples.persistence.es.taskmanager
 
 import akka.actor.typed.ActorRef
 import akka.pattern.StatusReply
 import akka.persistence.typed.scaladsl.*
 import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.{ DeserializationContext, JsonDeserializer }
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
-import com.github.uharaqo.akka.examples.persistence.es.TaskManagerCommand.GetTask
-import com.github.uharaqo.akka.examples.persistence.es.TaskManagerEvent.*
-import com.github.uharaqo.akka.examples.persistence.es.TaskManagerState.*
+import com.fasterxml.jackson.databind.{ DeserializationContext, JsonDeserializer }
+import com.github.uharaqo.akka.examples.persistence.es.taskmanager.TaskManagerCommand.GetTask
+import com.github.uharaqo.akka.examples.persistence.es.taskmanager.TaskManagerEvent.*
+import com.github.uharaqo.akka.examples.persistence.es.taskmanager.TaskManagerState.*
 
 object TaskManagerCommand {
 

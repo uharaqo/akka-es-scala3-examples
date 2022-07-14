@@ -1,9 +1,9 @@
-package com.github.uharaqo.akka.examples.persistence.es
+package com.github.uharaqo.akka.examples.persistence.es.taskmanager
 
 import akka.Done
 import akka.actor.typed.ActorRef
 import akka.pattern.StatusReply
-import com.github.uharaqo.akka.examples.persistence.es.TaskManagerState.*
+import com.github.uharaqo.akka.examples.persistence.es.taskmanager.TaskManagerState.*
 
 object TaskManagerEvent {
 
