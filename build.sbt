@@ -1,5 +1,5 @@
-val scala2Version = "2.13.8"
 val scala3Version = "3.1.3"
+//val scala2Version = "2.13.8"
 
 val AppVersion                 = "0.1.0"
 val AkkaVersion                = "2.6.19"
@@ -14,24 +14,18 @@ val akkaCommon = Seq(
   // akka
   "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
   "com.typesafe.akka" %% "akka-slf4j"       % AkkaVersion,
-  // test
-  "com.typesafe.akka" %% "akka-actor-testkit-typed" % AkkaVersion % Test,
-).map(
-  _.cross(CrossVersion.for3Use2_13)
-) ++ Seq(
   // util
   "org.scalactic" %% "scalactic"       % "3.2.12",
   "ch.qos.logback" % "logback-classic" % "1.2.11",
   // test
-  "org.scalatest" %% "scalatest" % "3.2.12" % Test,
+  "org.scalatest"     %% "scalatest"                % "3.2.12"    % Test,
+  "com.typesafe.akka" %% "akka-actor-testkit-typed" % AkkaVersion % Test,
 )
 
 val baseSettings = Seq(
   organization := "com.github.uharaqo",
   scalaVersion := scala3Version,
   version := AppVersion,
-  // To cross compile with Scala 3 and Scala 2
-//  crossScalaVersions := Seq(scala3Version, scala2Version),
   libraryDependencies ++= akkaCommon,
   Test / parallelExecution := false,
   run / fork := false,
@@ -39,13 +33,13 @@ val baseSettings = Seq(
 )
 
 val persistenceSettings = Seq(
+  // akka
   "com.typesafe.akka" %% "akka-persistence-typed"     % AkkaVersion,
   "com.typesafe.akka" %% "akka-serialization-jackson" % AkkaVersion,
-  "com.typesafe.akka" %% "akka-persistence-testkit"   % AkkaVersion % Test
-).map(
-  _.cross(CrossVersion.for3Use2_13)
-) ++ Seq(
+  // io
   "org.fusesource.leveldbjni" % "leveldbjni-all" % "1.8",
+  // test
+  "com.typesafe.akka" %% "akka-persistence-testkit" % AkkaVersion % Test,
 )
 
 ThisBuild / scalaVersion := scala3Version
