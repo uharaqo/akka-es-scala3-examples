@@ -9,11 +9,11 @@ import org.scalatest.wordspec.*
 
 import scala.concurrent.duration.DurationInt
 
-class AsyncTestingExampleSpec extends AnyWordSpec with BeforeAndAfterAll with Matchers {
-
-  private val testKit = ActorTestKit()
-
-  override def afterAll(): Unit = testKit.shutdownTestKit()
+class AsyncTestingExampleSpec
+    extends ScalaTestWithActorTestKit
+    with AnyWordSpecLike
+    with BeforeAndAfterAll
+    with Matchers {
 
   "echo" must {
     "call" in {

@@ -25,11 +25,18 @@ val akkaCommon = Seq(
 val baseSettings = Seq(
   organization := "com.github.uharaqo",
   scalaVersion := scala3Version,
-  version := AppVersion,
+  version      := AppVersion,
   libraryDependencies ++= akkaCommon,
   Test / parallelExecution := false,
-  run / fork := false,
-  Global / cancelable := false // ctrl-c
+  run / fork               := false,
+  Global / cancelable      := false // ctrl-c
+)
+
+val clusterSettings = Seq(
+  // akka
+  "com.typesafe.akka" %% "akka-cluster-typed" % AkkaVersion,
+  // test
+  "com.typesafe.akka" %% "akka-multi-node-testkit" % AkkaVersion % Test,
 )
 
 val persistenceSettings = Seq(
@@ -44,9 +51,12 @@ val persistenceSettings = Seq(
 
 ThisBuild / scalaVersion := scala3Version
 
+//val sbtPluginVersion           = "2.4.6"
+//addSbtPlugin("org.scalameta" % "sbt-scalafmt" % sbtPluginVersion)
+
 lazy val root = project
   .in(file("."))
-  .aggregate(basics, persistenceBasics)
+  .aggregate(basics, cluster, persistenceBasics)
 
 lazy val basics =
   (project in file("1_akka_basics"))
@@ -54,6 +64,14 @@ lazy val basics =
     .settings(
       name := "akka_basics",
       libraryDependencies ++= Seq()
+    )
+
+lazy val cluster =
+  (project in file("3_akka_cluster"))
+    .settings(baseSettings)
+    .settings(
+      name := "akka_cluster",
+      libraryDependencies ++= clusterSettings
     )
 
 lazy val persistenceBasics =
