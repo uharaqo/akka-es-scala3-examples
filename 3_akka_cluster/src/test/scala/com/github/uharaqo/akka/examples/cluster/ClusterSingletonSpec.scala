@@ -49,12 +49,9 @@ class ClusterSingletonSpec extends AnyWordSpecLike with BeforeAndAfterAll with M
       cluster1.manager ! JoinSeedNodes(Seq(cluster1.selfMember.address, cluster2.selfMember.address))
       cluster2.manager ! JoinSeedNodes(Seq(cluster1.selfMember.address, cluster2.selfMember.address))
 
-      Thread.sleep(1000)
+      Thread.sleep(10000)
 
       singleton1 ! "1st"
-
-      Thread.sleep(1000)
-
       singleton2 ! "2nd"
 
       Thread.sleep(1000)
@@ -62,8 +59,9 @@ class ClusterSingletonSpec extends AnyWordSpecLike with BeforeAndAfterAll with M
       val messages = queue.toArray
       messages should contain allElementsOf Seq(
         "akka://TestClusterSystem/system/singletonManagerSingleton1/Singleton1: 1st",
-//        "akka://TestClusterSystem/system/singletonManagerSingleton1/Singleton1: 2nd", // TODO: message to singleton2 gets lost
+        "akka://TestClusterSystem/system/singletonManagerSingleton1/Singleton1: 2nd",
       )
+      messages should have size 2
     }
   }
 
@@ -74,6 +72,7 @@ class ClusterSingletonSpec extends AnyWordSpecLike with BeforeAndAfterAll with M
         .parseString(
           s"""
           akka.remote.artery.canonical.port=$port
+          akka.cluster.min-nr-of-members = 2
           """
         )
         .withFallback(ConfigFactory.load())

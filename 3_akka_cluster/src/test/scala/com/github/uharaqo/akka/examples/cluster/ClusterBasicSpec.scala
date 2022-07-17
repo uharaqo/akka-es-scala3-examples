@@ -66,8 +66,8 @@ class ClusterBasicSpec extends AnyWordSpecLike with BeforeAndAfterAll with Match
       Thread.sleep(1000)
 
       val events = queue.toArray
-      events should have size 9
       events.map(_.toString) should contain allElementsOf Seq(
+        "MemberJoined(Member(akka://TestClusterSystem@192.168.1.68:15001, Joining))",
         "MemberUp(Member(akka://TestClusterSystem@192.168.1.68:15001, Up))",
         "MemberJoined(Member(akka://TestClusterSystem@192.168.1.68:15002, Joining))",
         "MemberUp(Member(akka://TestClusterSystem@192.168.1.68:15002, Up))",
@@ -78,6 +78,7 @@ class ClusterBasicSpec extends AnyWordSpecLike with BeforeAndAfterAll with Match
         "MemberExited(Member(akka://TestClusterSystem@192.168.1.68:15001, Exiting))",
         "MemberRemoved(Member(akka://TestClusterSystem@192.168.1.68:15001, Removed),Exiting)",
       )
+      events should have size 9
     }
   }
 
@@ -88,6 +89,7 @@ class ClusterBasicSpec extends AnyWordSpecLike with BeforeAndAfterAll with Match
         .parseString(
           s"""
           akka.remote.artery.canonical.port=$port
+          akka.cluster.min-nr-of-members = 2
           """
         )
         .withFallback(ConfigFactory.load())

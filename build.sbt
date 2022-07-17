@@ -34,7 +34,8 @@ val baseSettings = Seq(
 
 val clusterSettings = Seq(
   // akka
-  "com.typesafe.akka" %% "akka-cluster-typed" % AkkaVersion,
+  "com.typesafe.akka" %% "akka-cluster-typed"          % AkkaVersion,
+  "com.typesafe.akka" %% "akka-cluster-sharding-typed" % AkkaVersion,
   // test
   "com.typesafe.akka" %% "akka-multi-node-testkit" % AkkaVersion % Test,
 )
