@@ -1,9 +1,9 @@
 package com.github.uharaqo.akka.examples.cluster
 
-import akka.actor.{ ActorRef, AddressFromURIString, DeadLetter, ExtendedActorSystem, RepointableRef }
 import akka.actor.testkit.typed.scaladsl.{ ActorTestKit, ScalaTestWithActorTestKit }
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ ActorSystem, Behavior }
+import akka.actor.*
 import akka.cluster.ClusterEvent.*
 import akka.cluster.Member
 import akka.cluster.MemberStatus.*

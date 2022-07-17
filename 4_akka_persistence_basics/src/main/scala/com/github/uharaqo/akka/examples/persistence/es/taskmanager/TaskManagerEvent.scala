@@ -12,10 +12,11 @@ object TaskManagerEvent {
   final case class TaskStep(taskId: String, instruction: String) extends Event
   final case class TaskCompleted(taskId: String)                 extends Event
 
-  def handleEvent(state: Task, event: Event): Task =
+  val handleEvent: (Task, Event) => Task = { (state, event) =>
     event match {
       case TaskStarted(taskId) => Task(Option(taskId))
       case TaskStep(_, _)      => state
       case TaskCompleted(_)    => Task(None)
     }
+  }
 }

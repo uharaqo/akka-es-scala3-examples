@@ -10,6 +10,7 @@ import com.github.uharaqo.akka.examples.persistence.es.taskmanager.TaskManagerSt
 import scala.concurrent.duration.DurationInt
 
 object TaskManagerActor {
+
   private val eventHandler   = TaskManagerEvent.handleEvent
   private val commandHandler = TaskManagerCommand.commandHandler
 

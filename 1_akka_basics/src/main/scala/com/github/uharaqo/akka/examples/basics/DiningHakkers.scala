@@ -8,10 +8,10 @@ import com.github.uharaqo.akka.examples.basics.Hakker.Command
 
 import scala.concurrent.duration.*
 
-/**
- * Akka adaptation of [[http://www.dalnefre.com/wp/2010/08/dining-philosophers-in-humus/ the "Dining Philosophers" problem]]
- * to demonstrate a [[https://doc.akka.io/docs/akka/current/typed/fsm.html FSM]]
- */
+/** Akka adaptation of
+  * [[http://www.dalnefre.com/wp/2010/08/dining-philosophers-in-humus/ the "Dining Philosophers" problem]] to
+  * demonstrate a [[https://doc.akka.io/docs/akka/current/typed/fsm.html FSM]]
+  */
 
 // A Chopstick is an actor, it can be taken, and put back
 object Chopstick {
@@ -80,10 +80,10 @@ class Hakker(
     hungry
   }
 
-  //When a hakker is hungry it tries to pick up its chopsticks and eat
-  //When it picks one up, it goes into wait for the other
-  //If the hakkers first attempt at grabbing a chopstick fails,
-  //it starts to wait for the response of the other grab
+  // When a hakker is hungry it tries to pick up its chopsticks and eat
+  // When it picks one up, it goes into wait for the other
+  // If the hakkers first attempt at grabbing a chopstick fails,
+  // it starts to wait for the response of the other grab
   private lazy val hungry: Behavior[Command] = Behaviors.receiveMessagePartial {
     case HandleChopstickAnswer(Ok(`left`)) =>
       waitForOtherChopstick(chopstickToWaitFor = right, takenChopstick = left)
@@ -95,9 +95,9 @@ class Hakker(
       firstChopstickDenied
   }
 
-  //When a hakker is waiting for the last chopstick it can either obtain it
-  //and start eating, or the other chopstick was busy, and the hakker goes
-  //back to think about how he should obtain his chopsticks :-)
+  // When a hakker is waiting for the last chopstick it can either obtain it
+  // and start eating, or the other chopstick was busy, and the hakker goes
+  // back to think about how he should obtain his chopsticks :-)
   private def waitForOtherChopstick(
       chopstickToWaitFor: ActorRef[ChopstickRequest],
       takenChopstick: ActorRef[ChopstickRequest]
@@ -111,8 +111,8 @@ class Hakker(
       startThinking(ctx, 10.milliseconds)
   }
 
-  //When a hakker is eating, he can decide to start to think,
-  //then he puts down his chopsticks and starts to think
+  // When a hakker is eating, he can decide to start to think,
+  // then he puts down his chopsticks and starts to think
   private lazy val eating: Behavior[Command] = Behaviors.receiveMessagePartial { case Think =>
     ctx.log.info("{} puts down his chopsticks and starts to think", name)
     left ! Put(adapter)
@@ -120,9 +120,9 @@ class Hakker(
     startThinking(ctx, 5.seconds)
   }
 
-  //When the results of the other grab comes back,
-  //he needs to put it back if he got the other one.
-  //Then go back and think and try to grab the chopsticks again
+  // When the results of the other grab comes back,
+  // he needs to put it back if he got the other one.
+  // Then go back and think and try to grab the chopsticks again
   private lazy val firstChopstickDenied: Behavior[Command] = Behaviors.receiveMessagePartial {
     case HandleChopstickAnswer(Ok(chopstick)) =>
       chopstick ! Put(adapter)
