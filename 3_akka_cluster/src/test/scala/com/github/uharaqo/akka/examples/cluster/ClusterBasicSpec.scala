@@ -78,7 +78,7 @@ class ClusterBasicSpec extends AnyWordSpecLike with BeforeAndAfterAll with Match
         "MemberExited(Member(akka://TestClusterSystem@192.168.1.68:15001, Exiting))",
         "MemberRemoved(Member(akka://TestClusterSystem@192.168.1.68:15001, Removed),Exiting)",
       )
-      events should have size 9
+      events should have size 10
     }
   }
 
